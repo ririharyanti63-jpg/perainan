@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Tug of War - IPAS Kelas V</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Pixel Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            user-select: none;
+        }
+        .minecraft-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        /* Custom Minecraft Pixel Button Styles */
+        .mc-btn {
+            background-color: #727272;
+            border: 4px solid #373737;
+            box-shadow: inset -4px -4px 0px #212121, inset 4px 4px 0px #b5b5b5;
+            color: #fff;
+            font-family: 'Press Start 2P', monospace;
+            text-shadow: 2px 2px #000;
+            transition: transform 0.05s ease, background-color 0.1s ease;
+            cursor: pointer;
+        }
+        .mc-btn:hover {
+            background-color: #858585;
+            box-shadow: inset -4px -4px 0px #2c2c2c, inset 4px 4px 0px #e0e0e0;
+        }
+        .mc-btn:active {
+            transform: translateY(2px);
+            box-shadow: inset -2px -2px 0px #111, inset 2px 2px #999;
+        }
+        .mc-btn-green {
+            background-color: #388e3c;
+            border: 4px solid #1b5e20;
+            box-shadow: inset -4px -4px 0px #0d3810, inset 4px 4px 0px #81c784;
+        }
+        .mc-btn-green:hover {
+            background-color: #43a047;
+        }
+        .mc-btn-red {
+            background-color: #d32f2f;
+            border: 4px solid #811818;
+            box-shadow: inset -4px -4px 0px #4d0a0a, inset 4px 4px 0px #e57373;
+        }
+        .mc-btn-red:hover {
+            background-color: #e53935;
+        }
+        .mc-btn-blue {
+            background-color: #1976d2;
+            border: 4px solid #0d47a1;
+            box-shadow: inset -4px -4px 0px #062356, inset 4px 4px 0px #64b5f6;
+        }
+        .mc-btn-blue:hover {
+            background-color: #1e88e5;
+        }
+        .mc-panel {
+            background-color: #c6c6c6;
+            border: 4px solid #373737;
+            box-shadow: inset -4px -4px 0px #5e5e5e, inset 4px 4px 0px #ffffff;
+            color: #111;
+        }
+        .mc-dark-panel {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 4px solid #78350f;
+            box-shadow: inset -4px -4px 0px #b45309, inset 4px 4px 0px #fef08a;
+            color: #1c1917;
+        }
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 md:p-5 bg-emerald-50 text-stone-800 bg-[radial-gradient(#a7f3d0_1.5px,transparent_1.5px)] [background-size:20px_20px]">
+
+    <!-- HEADER BAR -->
+    <header class="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between py-3 mb-2 border-b-4 border-amber-800 bg-amber-100/90 rounded-xl px-6 shadow-md">
+        <div class="flex items-center space-x-3 mb-3 md:mb-0">
+            <div class="w-10 h-10 bg-emerald-500 border-2 border-emerald-800 flex items-center justify-center rounded shadow-[inset_-2px_-2px_0px_#15803d,inset_2px_2px_0px_#bbf7d0]">
+                <span class="minecraft-font text-lg text-yellow-300">⛏️</span>
+            </div>
+            <div>
+                <h1 class="minecraft-font text-xs md:text-sm text-amber-900 tracking-wider">MINECRAFT TUG OF WAR</h1>
+                <p class="text-xs text-amber-800 font-bold">IPAS Kelas V Bab 3: Harmoni dalam Ekosistem</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button id="bgmToggleBtn" onclick="toggleBGM()" class="mc-btn px-3 py-2 text-[10px] md:text-xs flex items-center space-x-2">
+                <span id="bgmLabel">🎵 Musik: OFF</span>
+            </button>
+            <button onclick="openRulesModal()" class="mc-btn px-3 py-2 text-[10px] md:text-xs">
+                📖 Cara Main
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main id="appContainer" class="w-full max-w-6xl flex-grow flex flex-col items-center justify-center my-2">
+        
+        <!-- VIEW 1: SETUP SCREEN -->
+        <div id="setupView" class="w-full max-w-2xl mc-dark-panel p-6 md:p-8 rounded-2xl shadow-xl flex flex-col items-center border-4 border-amber-800">
+            <div class="text-center mb-6">
+                <h2 class="minecraft-font text-amber-900 text-sm md:text-lg mb-2">ARENA TARIK TAMBANG IPAS</h2>
+                <p class="text-xs text-stone-700 font-semibold">Dua tim bertarung serentak (5-6 pemain per tim). Jawab soal paling cepat & tepat untuk menarik lawan!</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
+                <!-- Team A Setup -->
+                <div class="bg-blue-50/90 p-4 rounded-xl border-4 border-blue-500 flex flex-col space-y-3 shadow">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🔵</span>
+                        <label class="minecraft-font text-xs text-blue-900">Tim 1 (Kiri - Alex)</label>
+                    </div>
+                    <input type="text" id="teamANameInput" value="Tim Creeper" class="w-full bg-white border-2 border-blue-400 p-3 rounded text-stone-900 font-bold text-sm focus:outline-none focus:border-amber-500 shadow-inner">
+                    <p class="text-[11px] text-stone-600 font-medium">Karakter: Alex (Baju Hijau / Braid Orange)</p>
+                </div>
+
+                <!-- Team B Setup -->
+                <div class="bg-red-50/90 p-4 rounded-xl border-4 border-red-500 flex flex-col space-y-3 shadow">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🔴</span>
+                        <label class="minecraft-font text-xs text-red-900">Tim 2 (Kanan - Steve)</label>
+                    </div>
+                    <input type="text" id="teamBNameInput" value="Tim Diamond" class="w-full bg-white border-2 border-red-400 p-3 rounded text-stone-900 font-bold text-sm focus:outline-none focus:border-amber-500 shadow-inner">
+                    <p class="text-[11px] text-stone-600 font-medium">Karakter: Steve (Baju Cyan / Jeans Biru)</p>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="mc-btn mc-btn-green w-full py-4 text-xs md:text-sm rounded-lg tracking-wider transform hover:scale-102 transition-all shadow-md">
+                ⚔️ MULAI PERTARUNGAN SEKARANG! ⚔️
+            </button>
+        </div>
+
+        <!-- VIEW 2: BATTLE ARENA -->
+        <div id="battleView" class="w-full flex-col items-center space-y-4 hidden">
+            
+            <!-- SCOREBOARD & TIMER -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-3 bg-amber-100/90 border-4 border-amber-800 p-3 rounded-xl shadow-lg">
+                <!-- Team A Score -->
+                <div class="flex items-center justify-between bg-blue-100 p-3 rounded-lg border-2 border-blue-500 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-600 text-white rounded flex items-center justify-center font-bold text-base border-2 border-blue-300">🔵</div>
+                        <div>
+                            <h3 id="displayTeamAName" class="minecraft-font text-xs text-blue-900">Tim Creeper</h3>
+                            <p class="text-xs text-stone-700 font-semibold">Jawaban Benar: <span id="teamAScore" class="font-bold text-blue-800 text-sm">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Match Details -->
+                <div class="flex flex-col items-center justify-center py-1">
+                    <div class="minecraft-font text-[10px] text-amber-900 mb-1">ARENA OVERWORLD MINECRAFT</div>
+                    <div id="timerDisplay" class="minecraft-font text-sm text-amber-950 bg-amber-200 px-4 py-1.5 rounded border-2 border-amber-700 shadow-inner">03:00</div>
+                </div>
+
+                <!-- Team B Score -->
+                <div class="flex items-center justify-between bg-red-100 p-3 rounded-lg border-2 border-red-500 shadow-sm">
+                    <div class="flex items-center space-x-3 w-full justify-end flex-row-reverse md:flex-row">
+                        <div class="text-right mr-3 md:mr-0 md:ml-3">
+                            <h3 id="displayTeamBName" class="minecraft-font text-xs text-red-900">Tim Diamond</h3>
+                            <p class="text-xs text-stone-700 font-semibold">Jawaban Benar: <span id="teamBScore" class="font-bold text-red-800 text-sm">0</span></p>
+                        </div>
+                        <div class="w-10 h-10 bg-red-600 text-white rounded flex items-center justify-center font-bold text-base border-2 border-red-300">🔴</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CANVAS ARENA (MINECRAFT REALISTIC OVERWORLD) -->
+            <div class="w-full relative bg-amber-50 border-4 border-amber-800 rounded-xl overflow-hidden shadow-lg">
+                <canvas id="gameCanvas" width="960" height="300" class="w-full h-auto block"></canvas>
+                <div class="absolute bottom-2 left-3 bg-white/90 px-3 py-1 rounded border border-amber-700 text-[10px] text-amber-900 minecraft-font shadow">
+                    ⚡ 1 JAWABAN BENAR = 1 TARIKAN KUBUS!
+                </div>
+            </div>
+
+            <!-- DUAL QUIZ BOOTHS (SIMULTANEOUS PLAY) -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- TEAM A BOOTH -->
+                <div id="boothA" class="bg-blue-50/95 border-4 border-blue-600 p-4 rounded-xl shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3 border-b-2 border-blue-200 pb-2">
+                            <span id="boothAName" class="minecraft-font text-xs text-blue-900">Tim Creeper</span>
+                            <span id="streakA" class="text-xs bg-blue-200 border border-blue-500 px-2.5 py-1 rounded-full text-blue-900 font-bold">Streak: 0 🔥</span>
+                        </div>
+                        <div id="questionContainerA" class="mb-3">
+                            <p id="qTextA" class="text-sm font-bold text-slate-800 mb-3 min-h-[54px] leading-snug">Memuat soal IPAS...</p>
+                            <div id="optionsContainerA" class="grid grid-cols-1 gap-2">
+                                <!-- Dynamic Options A -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="feedbackA" class="text-xs font-bold text-center py-2 rounded-lg hidden shadow-sm"></div>
+                </div>
+
+                <!-- TEAM B BOOTH -->
+                <div id="boothB" class="bg-red-50/95 border-4 border-red-600 p-4 rounded-xl shadow-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3 border-b-2 border-red-200 pb-2">
+                            <span id="boothBName" class="minecraft-font text-xs text-red-900">Tim Diamond</span>
+                            <span id="streakB" class="text-xs bg-red-200 border border-red-500 px-2.5 py-1 rounded-full text-red-900 font-bold">Streak: 0 🔥</span>
+                        </div>
+                        <div id="questionContainerB" class="mb-3">
+                            <p id="qTextB" class="text-sm font-bold text-slate-800 mb-3 min-h-[54px] leading-snug">Memuat soal IPAS...</p>
+                            <div id="optionsContainerB" class="grid grid-cols-1 gap-2">
+                                <!-- Dynamic Options B -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="feedbackB" class="text-xs font-bold text-center py-2 rounded-lg hidden shadow-sm"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- VIEW 3: GAME OVER / VICTORY SCREEN -->
+        <div id="gameOverView" class="w-full max-w-xl mc-dark-panel p-8 rounded-2xl shadow-2xl flex flex-col items-center text-center border-4 border-amber-800 hidden">
+            <div class="text-6xl mb-4 animate-bounce">🏆</div>
+            <h2 id="winnerTitle" class="minecraft-font text-base md:text-xl text-amber-900 mb-2">TIM PEMENANG!</h2>
+            <p id="winnerSubtitle" class="text-stone-700 text-xs md:text-sm font-medium mb-6">Berhasil menarik tali kubus ke zona kemenangan ekosistem!</p>
+            
+            <div class="bg-amber-50 border-2 border-amber-300 p-5 rounded-xl w-full mb-6 text-left space-y-3 shadow-inner">
+                <div class="flex justify-between text-sm border-b border-amber-200 pb-2">
+                    <span id="summaryTeamA" class="text-blue-800 font-bold">Tim A: 0 Jawaban Benar</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span id="summaryTeamB" class="text-red-800 font-bold">Tim B: 0 Jawaban Benar</span>
+                </div>
+            </div>
+
+            <div class="flex space-x-4 w-full">
+                <button onclick="resetGame()" class="mc-btn mc-btn-green flex-1 py-3 text-xs md:text-sm rounded-lg shadow">
+                    🔄 Main Lagi
+                </button>
+                <button onclick="backToSetup()" class="mc-btn mc-btn-red flex-1 py-3 text-xs md:text-sm rounded-lg shadow">
+                    ⚙️ Ubah Tim
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RULES MODAL -->
+    <div id="rulesModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+            <h3 class="minecraft-font text-sm text-amber-900 mb-4 text-center">CARA BERMAIN TARIK TAMBANG IPAS</h3>
+            <div class="text-xs space-y-3 mb-6 font-semibold leading-relaxed text-stone-800">
+                <p>1. <strong>Bermain Serentak (Tanpa Bergiliran):</strong> Tim 1 dan Tim 2 langsung menjawab soal di bilik masing-masing secara bersamaan.</p>
+                <p>2. <strong>Sistem Tarikan Energi:</strong> Setiap kali tim menjawab 1 soal dengan benar, tali tambang Minecraft akan langsung ditarik ke arah tim tersebut.</p>
+                <p>3. <strong>Soal IPAS Melimpah:</strong> Soal dikocok acak dari Bab 3 "Harmoni dalam Ekosistem" sehingga tidak mudah mengulang.</p>
+                <p>4. <strong>Kondisi Menang:</strong> Tim yang berhasil menarik bendera ke garis batas zona menang atau mengumpulkan tarikan terbanyak saat waktu habis akan menjadi pemenang!</p>
+            </div>
+            <button onclick="closeRulesModal()" class="mc-btn mc-btn-green w-full py-3 text-xs rounded">SIAP, AYO BERTARUNG!</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- AUDIO SYNTHESIZER ENGINE (Web Audio API) ---
+        let audioCtx = null;
+        let bgmInterval = null;
+        let isBgmOn = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(146.83, now + 0.12);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'pull') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(300, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(700, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+                    osc.start(now);
+                    osc.stop(now + 0.04);
+                }
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function toggleBGM() {
+            initAudio();
+            isBgmOn = !isBgmOn;
+            const bgmLabel = document.getElementById('bgmLabel');
+            if (isBgmOn) {
+                bgmLabel.innerText = '🎵 Musik: ON';
+                startBGMSequence();
+            } else {
+                bgmLabel.innerText = '🎵 Musik: OFF';
+                if (bgmInterval) clearInterval(bgmInterval);
+            }
+            playSound('click');
+        }
+
+        function startBGMSequence() {
+            if (bgmInterval) clearInterval(bgmInterval);
+            // Expressive upbeat 8-bit melody arpeggios
+            const melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 440.00, 523.25, 349.23, 440.00, 523.25, 659.25, 392.00, 493.88];
+            let step = 0;
+            bgmInterval = setInterval(() => {
+                if (!isBgmOn || !audioCtx) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(melody[step % melody.length], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.22);
+                    step++;
+                } catch(e) {}
+            }, 250);
+        }
+
+        // --- COMPREHENSIVE IPAS KELAS V BAB 3 QUESTION BANK (32 QUESTIONS) ---
+        const rawQuestionBank = [
+            // A. Pengertian Ekosistem
+            {
+                q: "Apa yang dimaksud dengan ekosistem?",
+                options: [
+                    "Hubungan timbal balik antara makhluk hidup dengan lingkungan tempat tinggalnya",
+                    "Kumpulan hewan pemangsa yang hidup di hutan hujan tropis",
+                    "Tempat buatan manusia untuk membudidayakan tanaman dan ikan",
+                    "Proses pembuatan makanan pada tumbuhan hijau menggunakan sinar matahari"
+                ],
+                answer: 0
+            },
+            {
+                q: "Di sawah terdapat padi, belalang, katak, air, tanah, dan sinar matahari yang saling berhubungan. Hal ini dinamakan...",
+                options: ["Komunitas", "Ekosistem", "Populasi", "Habitat"],
+                answer: 1
+            },
+
+            // B. Komponen Ekosistem
+            {
+                q: "Komponen ekosistem yang terdiri atas semua makhluk hidup disebut komponen...",
+                options: ["Abiotik", "Biotik", "Organik", "Atmosfer"],
+                answer: 1
+            },
+            {
+                q: "Manakah di bawah ini yang seluruhnya merupakan komponen abiotik?",
+                options: ["Air, tanah, udara, dan sinar matahari", "Pohon jati, rumput, dan cacing tanah", "Bakteri, jamur, dan kelelawar", "Ikan mas, air, dan tanaman teratai"],
+                answer: 0
+            },
+            {
+                q: "Tumbuhan membutuhkan air, tanah, dan sinar matahari untuk tumbuh. Hal ini menunjukkan bahwa...",
+                options: [
+                    "Komponen abiotik memengaruhi komponen biotik",
+                    "Komponen biotik tidak memerlukan lingkungan",
+                    "Komponen abiotik dapat hidup tanpa komponen biotik",
+                    "Hanya tumbuhan yang memerlukan air"
+                ],
+                answer: 0
+            },
+
+            // C. Istilah Penting
+            {
+                q: "Satu makhluk hidup tunggal dalam suatu ekosistem dinamakan...",
+                options: ["Populasi", "Komunitas", "Individu", "Habitat"],
+                answer: 2
+            },
+            {
+                q: "Sekumpulan ikan mas sejenis yang tinggal di dalam sebuah kolam dinamakan...",
+                options: ["Individu", "Populasi", "Komunitas", "Biosfer"],
+                answer: 1
+            },
+            {
+                q: "Kumpulan berbagai populasi yang hidup bersama di suatu wilayah dinamakan...",
+                options: ["Komunitas", "Individu", "Habitat", "Ekosistem buatan"],
+                answer: 0
+            },
+            {
+                q: "Tempat tinggal alami suatu makhluk hidup untuk berkembang biak dinamakan...",
+                options: ["Populasi", "Habitat", "Niche", "Komunitas"],
+                answer: 1
+            },
+
+            // D. Jenis-Jenis Ekosistem
+            {
+                q: "Hutan, padang rumput, dan gurun pasir merupakan contoh dari ekosistem...",
+                options: ["Perairan", "Darat", "Buatan", "Pesisir"],
+                answer: 1
+            },
+            {
+                q: "Sungai, danau, laut, dan kolam termasuk ke dalam kelompok ekosistem...",
+                options: ["Darat", "Sintetis", "Perairan", "Buatan manusia"],
+                answer: 2
+            },
+            {
+                q: "Ekosistem yang terbentuk secara alamiah tanpa campur tangan manusia adalah ekosistem alami. Contohnya adalah...",
+                options: ["Sawah dan kebun", "Hutan dan laut", "Kolam ikan dan akuarium", "Taman kota dan waduk"],
+                answer: 1
+            },
+            {
+                q: "Sawah, kebun kelapa sawit, dan kolam ikan merupakan contoh dari ekosistem...",
+                options: ["Alami", "Buatan", "Darat murni", "Laut dalam"],
+                answer: 1
+            },
+
+            // E. Interaksi dalam Ekosistem
+            {
+                q: "Hubungan antara hewan pemangsa (predator) dengan hewan mangsanya disebut...",
+                options: ["Kompetisi", "Predasi", "Mutualisme", "Parasitisme"],
+                answer: 1
+            },
+            {
+                q: "Contoh hubungan predasi dalam ekosistem sawah adalah...",
+                options: ["Ular memangsa tikus", "Tanaman padi bersaing mendapatkan air", "Kupu-kupu hinggap di bunga", "Kutu tinggal di tubuh kucing"],
+                answer: 0
+            },
+            {
+                q: "Persaingan antarmakhluk hidup untuk mendapatkan makanan, air, dan tempat tinggal dinamakan...",
+                options: ["Komensalisme", "Predasi", "Kompetisi", "Mutualisme"],
+                answer: 2
+            },
+            {
+                q: "Hubungan simbiosis di mana kedua makhluk hidup sama-sama diuntungkan dinamakan...",
+                options: ["Simbiosis Mutualisme", "Simbiosis Komensalisme", "Simbiosis Parasitisme", "Predasi"],
+                answer: 0
+            },
+            {
+                q: "Hubungan lebah yang menghisap nektar bunga sekaligus membantu penyerbukan bunga merupakan contoh...",
+                options: ["Komensalisme", "Mutualisme", "Parasitisme", "Kompetisi"],
+                answer: 1
+            },
+            {
+                q: "Tanaman anggrek yang menempel pada pohon tinggi untuk mendapat cahaya matahari tanpa merugikan pohon tersebut dinamakan simbiosis...",
+                options: ["Parasitisme", "Mutualisme", "Komensalisme", "Predasi"],
+                answer: 2
+            },
+            {
+                q: "Hubungan di mana satu pihak diuntungkan sedangkan pihak lain dirugikan adalah simbiosis...",
+                options: ["Mutualisme", "Komensalisme", "Parasitisme", "Kompetisi"],
+                answer: 2
+            },
+            {
+                q: "Contoh dari simbiosis parasitisme adalah...",
+                options: ["Kutu yang hidup di tubuh kucing", "Ikan remora mengikut hiu", "Burung jalak hinggap di kerbau", "Anggrek menempel di pohon"],
+                answer: 0
+            },
+
+            // F. Rantai Makanan
+            {
+                q: "Urutan peristiwa makan dan dimakan antarmakhluk hidup yang menunjukkan perpindahan energi disebut...",
+                options: ["Jaring-jaring makanan", "Rantai makanan", "Piramida makanan", "Daur biogeokimia"],
+                answer: 1
+            },
+            {
+                q: "Makhluk hidup yang dapat membuat makanannya sendiri melalui fotosintesis disebut...",
+                options: ["Konsumen I", "Produsen", "Pengurai", "Karnivora"],
+                answer: 1
+            },
+            {
+                q: "Dalam rantai makanan: Padi → Belalang → Katak → Ular, yang berperan sebagai konsumen tingkat I adalah...",
+                options: ["Padi", "Belalang", "Katak", "Ular"],
+                answer: 1
+            },
+            {
+                q: "Organisme seperti jamur dan bakteri yang menguraikan sisa-sisa makhluk hidup yang mati disebut...",
+                options: ["Produsen", "Pengurai (Dekomposer)", "Konsumen puncak", "Herbivora"],
+                answer: 1
+            },
+
+            // G. Jaring-Jaring Makanan
+            {
+                q: "Gabungan dari beberapa rantai makanan yang saling berhubungan dalam suatu ekosistem dinamakan...",
+                options: ["Piramida makanan", "Jaring-jaring makanan", "Siklus hidup", "Komunitas alami"],
+                answer: 1
+            },
+            {
+                q: "Keberadaan jaring-jaring makanan menunjukkan bahwa...",
+                options: [
+                    "Satu jenis makhluk hidup dapat memiliki lebih dari satu sumber makanan atau pemangsa",
+                    "Setiap hewan hanya bisa memakan satu jenis tumbuhan",
+                    "Rantai makanan tidak pernah saling berhubungan",
+                    "Pengurai hanya menguraikan tumbuhan hijau"
+                ],
+                answer: 0
+            },
+
+            // H. Keseimbangan Ekosistem
+            {
+                q: "Keadaan ketika komponen biotik dan abiotik berinteraksi secara selaras dinamakan...",
+                options: ["Pencemaran lingkungan", "Keseimbangan ekosistem", "Kompetisi ekosistem", "Kepunahan spesies"],
+                answer: 1
+            },
+            {
+                q: "Manakah di bawah ini yang merupakan faktor alam penyebab terganggunya keseimbangan ekosistem?",
+                options: ["Penebangan hutan liar", "Letusan gunung berapi dan banjir", "Penggunaan pestisida berlebihan", "Perburuan hewan liar"],
+                answer: 1
+            },
+            {
+                q: "Aktivitas manusia yang dapat merusak keseimbangan ekosistem di sawah adalah...",
+                options: ["Penggunaan pestisida secara berlebihan", "Menanam pohon di sekitar lokasi", "Membuat terasering tanah", "Menggunakan pupuk organik"],
+                answer: 0
+            },
+
+            // I. Peran Manusia
+            {
+                q: "Upaya yang dapat dilakukan manusia untuk menjaga kelestarian dan keseimbangan ekosistem adalah...",
+                options: ["Membuang sampah ke sungai", "Melakukan reboisasi dan menanam pohon", "Menebang pohon secara liar", "Memburu hewan langka untuk perhiasan"],
+                answer: 1
+            },
+            {
+                q: "Dampak buruk dari perburuan hewan liar secara terus-menerus terhadap ekosistem adalah...",
+                options: [
+                    "Populasi hewan tersebut punah dan rantai makanan terganggu",
+                    "Tanaman hijau akan tumbuh lebih cepat",
+                    "Jumlah produsen berkurang drastis",
+                    "Ekosistem menjadi semakin seimbang"
+                ],
+                answer: 0
+            }
+        ];
+
+        // --- GAME STATE VARIABLES ---
+        let gameActive = false;
+        let teamAName = "Tim Creeper";
+        let teamBName = "Tim Diamond";
+        let scoreA = 0;
+        let scoreB = 0;
+        let streakA = 0;
+        let streakB = 0;
+        let ropePosition = 0; // Ranges from -50 (Team A Wins) to +50 (Team B Wins)
+        let targetRopePosition = 0; // For smooth lerp movement
+        let timeLeft = 180;
+        let timerInterval = null;
+
+        let deckA = [];
+        let deckB = [];
+        let currentQA = null;
+        let currentQB = null;
+
+        // Shuffle Array Utility
+        function shuffleArray(arr) {
+            const array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- CANVAS RENDERING (REALISTIC MINECRAFT OVERWORLD STYLE) ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawMinecraftScene() {
+            // Smoothlerp rope movement
+            ropePosition += (targetRopePosition - ropePosition) * 0.12;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Sky & Atmosphere (Minecraft Daylight Gradient)
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, 190);
+            skyGrad.addColorStop(0, '#38bdf8'); // Bright Minecraft Sky
+            skyGrad.addColorStop(0.7, '#7dd3fc');
+            skyGrad.addColorStop(1, '#bae6fd');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, 190);
+
+            // Sun (Blocky Minecraft Sun)
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(800, 20, 50, 50);
+            ctx.fillStyle = '#fef9c3';
+            ctx.fillRect(805, 25, 40, 40);
+
+            // 2. Distant Blocky Mountains Range
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(0, 190);
+            ctx.lineTo(80, 120); ctx.lineTo(140, 140); ctx.lineTo(220, 90);
+            ctx.lineTo(310, 150); ctx.lineTo(400, 80); ctx.lineTo(490, 130);
+            ctx.lineTo(580, 70); ctx.lineTo(680, 140); ctx.lineTo(780, 85);
+            ctx.lineTo(880, 135); ctx.lineTo(960, 100); ctx.lineTo(960, 190);
+            ctx.fill();
+
+            // Mountain Snow/Highlight Caps
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(205, 90, 30, 15);
+            ctx.fillRect(385, 80, 30, 15);
+            ctx.fillRect(565, 70, 30, 15);
+            ctx.fillRect(765, 85, 30, 15);
+
+            // Midground Darker Forest Hills
+            ctx.fillStyle = '#1e3a1e';
+            for (let i = 0; i < canvas.width; i += 40) {
+                const hillHeight = 135 + Math.sin(i * 0.015) * 20 + (i % 80 === 0 ? 10 : 0);
+                ctx.fillRect(i, hillHeight, 40, 190 - hillHeight);
+            }
+
+            // Minecraft Clouds
+            drawPixelCloud(60, 25, 130, 26);
+            drawPixelCloud(380, 40, 150, 30);
+            drawPixelCloud(680, 20, 120, 24);
+
+            // 3. Ground Terrain - Blocky Stepped Grass & Dirt
+            // Base Dirt Layer
+            ctx.fillStyle = '#866043'; // Minecraft Dirt Base
+            ctx.fillRect(0, 190, canvas.width, 110);
+
+            // Dirt Pattern Details
+            ctx.fillStyle = '#65432a';
+            for (let x = 8; x < canvas.width; x += 32) {
+                for (let y = 205; y < canvas.height; y += 22) {
+                    if ((x + y) % 7 === 0) ctx.fillRect(x, y, 12, 10);
+                }
+            }
+
+            // Top Grass Layer (Vibrant Overworld Green)
+            ctx.fillStyle = '#4ade80'; // Bright Top Grass
+            ctx.fillRect(0, 185, canvas.width, 12);
+            ctx.fillStyle = '#22c55e'; // Grass overhang sides
+            for (let x = 0; x < canvas.width; x += 16) {
+                const drop = (x % 32 === 0) ? 10 : 5;
+                ctx.fillRect(x, 197, 16, drop);
+            }
+
+            // Background Minecraft Trees
+            drawMinecraftTree(90, 115);
+            drawMinecraftTree(200, 125);
+            drawMinecraftTree(760, 125);
+            drawMinecraftTree(870, 115);
+
+            // Win Zone Markers & Center Post
+            const centerX = canvas.width / 2;
+            
+            // Win Boundaries
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.35)'; // Blue zone
+            ctx.fillRect(130, 185, 10, 115);
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';  // Red zone
+            ctx.fillRect(820, 185, 10, 115);
+
+            // Center Redstone/Gold Tug Post
+            ctx.fillStyle = '#374151'; // Fence Post
+            ctx.fillRect(centerX - 3, 125, 6, 65);
+            // Redstone/Gold Flag
+            ctx.fillStyle = '#eab308';
+            ctx.fillRect(centerX, 128, 32, 22);
+            ctx.fillStyle = '#ca8a04';
+            ctx.fillRect(centerX + 6, 133, 20, 12);
+
+            // 4. Rope Mechanics
+            const ropeOffset = ropePosition * 4.2;
+            const leftTeamX = 220 + ropeOffset;
+            const rightTeamX = 740 + ropeOffset;
+
+            // Textured Rope
+            ctx.strokeStyle = '#291d0f'; // Rope Outline
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(leftTeamX + 25, 172);
+            ctx.lineTo(rightTeamX - 25, 172);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#d97706'; // Rope Core
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(leftTeamX + 25, 172);
+            ctx.lineTo(rightTeamX - 25, 172);
+            ctx.stroke();
+
+            // Center Knot on Rope
+            const knotX = centerX + ropeOffset;
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(knotX - 7, 164, 14, 16);
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(knotX - 4, 167, 8, 10);
+
+            // 5. Draw Authentic Characters (Alex Left / Steve Right)
+            drawMinecraftAlex(leftTeamX, 112, teamAName, '🔵');
+            drawMinecraftSteve(rightTeamX, 112, teamBName, '🔴');
+        }
+
+        function drawPixelCloud(x, y, w, h) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(x, y, w, h);
+            ctx.fillRect(x + 16, y - 10, w - 32, h + 10);
+            ctx.fillStyle = 'rgba(203, 213, 225, 0.9)'; // Cloud shadow
+            ctx.fillRect(x, y + h - 6, w, 6);
+        }
+
+        function drawMinecraftTree(x, y) {
+            // Trunk
+            ctx.fillStyle = '#543d2b';
+            ctx.fillRect(x + 12, y + 30, 16, 42);
+            ctx.fillStyle = '#3d2b1d';
+            ctx.fillRect(x + 12, y + 30, 4, 42);
+
+            // Leaves Canopy
+            ctx.fillStyle = '#166534'; // Dark Leaf
+            ctx.fillRect(x - 10, y - 10, 60, 42);
+            ctx.fillStyle = '#22c55e'; // Main Leaf
+            ctx.fillRect(x - 6, y - 6, 52, 34);
+            ctx.fillStyle = '#86efac'; // Highlight
+            ctx.fillRect(x + 4, y - 6, 18, 12);
+        }
+
+        // --- AUTHENTIC ALEX MODEL (Team 1) ---
+        function drawMinecraftAlex(x, y, name, badge) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Name Tag Badge
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.fillRect(-60, -32, 120, 24);
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-60, -32, 120, 24);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px "Press Start 2P"';
+            ctx.textAlign = 'center';
+            ctx.fillText(badge + ' ' + name.substring(0, 9), 0, -16);
+
+            // Head (Alex skin tone)
+            ctx.fillStyle = '#f3c29f';
+            ctx.fillRect(-16, 0, 32, 32);
+
+            // Alex Hair (Orange/Ginger)
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(-18, -4, 36, 14); // Hair Top
+            ctx.fillRect(-18, 0, 8, 28);   // Braid Side
+            ctx.fillRect(-16, 10, 10, 12);
+
+            // Eyes (Green)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-10, 12, 8, 5);
+            ctx.fillRect(2, 12, 8, 5);
+            ctx.fillStyle = '#16a34a'; // Green Iris
+            ctx.fillRect(-6, 12, 4, 5);
+            ctx.fillRect(6, 12, 4, 5);
+
+            // Mouth
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(-4, 22, 8, 3);
+
+            // Body (Green Alex Tunic)
+            ctx.fillStyle = '#65a30d';
+            ctx.fillRect(-12, 32, 24, 32);
+            ctx.fillStyle = '#3f6212'; // Belt
+            ctx.fillRect(-12, 56, 24, 8);
+
+            // Arms in Tugging Pose
+            ctx.fillStyle = '#f3c29f'; // Hand pulling
+            ctx.fillRect(8, 36, 18, 10);
+            ctx.fillStyle = '#65a30d'; // Sleeve
+            ctx.fillRect(-18, 34, 10, 18);
+
+            // Legs (Brown Pants)
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(-12, 64, 10, 28);
+            ctx.fillRect(2, 64, 10, 28);
+            // Boots
+            ctx.fillStyle = '#1c1917';
+            ctx.fillRect(-12, 86, 10, 6);
+            ctx.fillRect(2, 86, 10, 6);
+
+            ctx.restore();
+        }
+
+        // --- AUTHENTIC STEVE MODEL (Team 2) ---
+        function drawMinecraftSteve(x, y, name, badge) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Name Tag Badge
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.fillRect(-60, -32, 120, 24);
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-60, -32, 120, 24);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px "Press Start 2P"';
+            ctx.textAlign = 'center';
+            ctx.fillText(badge + ' ' + name.substring(0, 9), 0, -16);
+
+            // Head (Steve skin tone)
+            ctx.fillStyle = '#c68a5c';
+            ctx.fillRect(-16, 0, 32, 32);
+
+            // Steve Hair (Dark Brown)
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(-16, -4, 32, 12);
+            ctx.fillRect(-18, 0, 6, 16);
+            ctx.fillRect(12, 0, 6, 16);
+
+            // Eyes (Blue)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-10, 12, 8, 5);
+            ctx.fillRect(2, 12, 8, 5);
+            ctx.fillStyle = '#2563eb'; // Blue Iris
+            ctx.fillRect(-10, 12, 4, 5);
+            ctx.fillRect(2, 12, 4, 5);
+
+            // Nose & Mouth / Beard
+            ctx.fillStyle = '#a1653d';
+            ctx.fillRect(-4, 18, 8, 4);
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(-6, 22, 12, 3);
+
+            // Body (Cyan/Blue Shirt)
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillRect(-12, 32, 24, 32);
+
+            // Arms in Tugging Pose
+            ctx.fillStyle = '#06b6d4'; // Sleeve
+            ctx.fillRect(8, 34, 10, 18);
+            ctx.fillStyle = '#c68a5c'; // Hand pulling
+            ctx.fillRect(-26, 36, 18, 10);
+
+            // Legs (Blue Jeans)
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(-12, 64, 10, 28);
+            ctx.fillRect(2, 64, 10, 28);
+            // Shoes
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(-12, 86, 10, 6);
+            ctx.fillRect(2, 86, 10, 6);
+
+            ctx.restore();
+        }
+
+        // --- GAME CONTROL & FLOW ---
+        function gameLoop() {
+            if (gameActive) {
+                drawMinecraftScene();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function startGame() {
+            initAudio();
+            teamAName = document.getElementById('teamANameInput').value.trim() || "Tim Creeper";
+            teamBName = document.getElementById('teamBNameInput').value.trim() || "Tim Diamond";
+
+            document.getElementById('displayTeamAName').innerText = teamAName;
+            document.getElementById('displayTeamBName').innerText = teamBName;
+            document.getElementById('boothAName').innerText = teamAName;
+            document.getElementById('boothBName').innerText = teamBName;
+
+            scoreA = 0;
+            scoreB = 0;
+            streakA = 0;
+            streakB = 0;
+            ropePosition = 0;
+            targetRopePosition = 0;
+            timeLeft = 180;
+
+            document.getElementById('teamAScore').innerText = '0';
+            document.getElementById('teamBScore').innerText = '0';
+            document.getElementById('streakA').innerText = 'Streak: 0 🔥';
+            document.getElementById('streakB').innerText = 'Streak: 0 🔥';
+
+            // Prepare Question Decks
+            deckA = shuffleArray(rawQuestionBank);
+            deckB = shuffleArray(rawQuestionBank);
+
+            document.getElementById('setupView').classList.add('hidden');
+            document.getElementById('gameOverView').classList.add('hidden');
+            document.getElementById('battleView').classList.remove('hidden');
+            document.getElementById('battleView').classList.add('flex');
+
+            gameActive = true;
+            drawMinecraftScene();
+            requestAnimationFrame(gameLoop);
+
+            loadNextQuestion('A');
+            loadNextQuestion('B');
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let mins = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                document.getElementById('timerDisplay').innerText = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+                if (timeLeft <= 0) {
+                    endGame("Waktu Habis!");
+                }
+            }, 1000);
+
+            playSound('click');
+        }
+
+        function loadNextQuestion(team) {
+            const isTeamA = team === 'A';
+            let deck = isTeamA ? deckA : deckB;
+
+            if (deck.length === 0) {
+                // Re-shuffle if all questions answered
+                deck = shuffleArray(rawQuestionBank);
+                if (isTeamA) deckA = deck; else deckB = deck;
+            }
+
+            const q = deck.pop();
+
+            if (isTeamA) {
+                currentQA = q;
+                document.getElementById('qTextA').innerText = q.q;
+                const optsContainer = document.getElementById('optionsContainerA');
+                optsContainer.innerHTML = '';
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left bg-white hover:bg-blue-100 border-2 border-blue-400 p-2.5 rounded-lg text-xs text-slate-800 font-semibold transition-all duration-100 hover:scale-[1.01] shadow-sm';
+                    btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+                    btn.onclick = () => answerQuestion('A', idx);
+                    optsContainer.appendChild(btn);
+                });
+                document.getElementById('feedbackA').classList.add('hidden');
+            } else {
+                currentQB = q;
+                document.getElementById('qTextB').innerText = q.q;
+                const optsContainer = document.getElementById('optionsContainerB');
+                optsContainer.innerHTML = '';
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left bg-white hover:bg-red-100 border-2 border-red-400 p-2.5 rounded-lg text-xs text-slate-800 font-semibold transition-all duration-100 hover:scale-[1.01] shadow-sm';
+                    btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
+                    btn.onclick = () => answerQuestion('B', idx);
+                    optsContainer.appendChild(btn);
+                });
+                document.getElementById('feedbackB').classList.add('hidden');
+            }
+        }
+
+        function answerQuestion(team, selectedIdx) {
+            if (!gameActive) return;
+
+            const isTeamA = team === 'A';
+            const currentQ = isTeamA ? currentQA : currentQB;
+            const feedbackEl = document.getElementById(isTeamA ? 'feedbackA' : 'feedbackB');
+
+            feedbackEl.classList.remove('hidden');
+
+            if (selectedIdx === currentQ.answer) {
+                playSound('correct');
+                playSound('pull');
+                feedbackEl.innerText = "✔️ BENAR! (+1 Tarikan Energi)";
+                feedbackEl.className = "text-xs font-bold text-center py-2 rounded-lg bg-emerald-600 text-white shadow";
+
+                if (isTeamA) {
+                    scoreA++;
+                    streakA++;
+                    targetRopePosition -= 2.8; // Pull left
+                    document.getElementById('teamAScore').innerText = scoreA;
+                    document.getElementById('streakA').innerText = `Streak: ${streakA} 🔥`;
+                } else {
+                    scoreB++;
+                    streakB++;
+                    targetRopePosition += 2.8; // Pull right
+                    document.getElementById('teamBScore').innerText = scoreB;
+                    document.getElementById('streakB').innerText = `Streak: ${streakB} 🔥`;
+                }
+
+                // Check Victory Thresholds
+                if (targetRopePosition <= -48) {
+                    endGame(`${teamAName} Menang Tarik Tambang!`);
+                    return;
+                } else if (targetRopePosition >= 48) {
+                    endGame(`${teamBName} Menang Tarik Tambang!`);
+                    return;
+                }
+
+                setTimeout(() => {
+                    loadNextQuestion(team);
+                }, 400);
+
+            } else {
+                playSound('wrong');
+                feedbackEl.innerText = "❌ SALAH! Jawaban kurang tepat.";
+                feedbackEl.className = "text-xs font-bold text-center py-2 rounded-lg bg-rose-700 text-white shadow";
+
+                if (isTeamA) {
+                    streakA = 0;
+                    document.getElementById('streakA').innerText = `Streak: 0 🔥`;
+                } else {
+                    streakB = 0;
+                    document.getElementById('streakB').innerText = `Streak: 0 🔥`;
+                }
+            }
+        }
+
+        function endGame(reason) {
+            gameActive = false;
+            if (timerInterval) clearInterval(timerInterval);
+
+            document.getElementById('battleView').classList.remove('flex');
+            document.getElementById('battleView').classList.add('hidden');
+            document.getElementById('gameOverView').classList.remove('hidden');
+
+            let winnerText = reason;
+            if (scoreA > scoreB) {
+                winnerText = `🏆 ${teamAName.toUpperCase()} MENANG!`;
+            } else if (scoreB > scoreA) {
+                winnerText = `🏆 ${teamBName.toUpperCase()} MENANG!`;
+            } else {
+                winnerText = `🤝 PERTANDINGAN SERI!`;
+            }
+
+            document.getElementById('winnerTitle').innerText = winnerText;
+            document.getElementById('summaryTeamA').innerText = `${teamAName}: ${scoreA} Jawaban Benar`;
+            document.getElementById('summaryTeamB').innerText = `${teamBName}: ${scoreB} Jawaban Benar`;
+            playSound('correct');
+        }
+
+        function resetGame() {
+            startGame();
+        }
+
+        function backToSetup() {
+            gameActive = false;
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('battleView').classList.remove('flex');
+            document.getElementById('battleView').classList.add('hidden');
+            document.getElementById('gameOverView').classList.add('hidden');
+            document.getElementById('setupView').classList.remove('hidden');
+            playSound('click');
+        }
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+            playSound('click');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+            playSound('click');
+        }
+
+        // Render Initial Canvas Landscape on Page Load
+        window.onload = function() {
+            drawMinecraftScene();
+        }
+    </script>
+</body>
+</html>
